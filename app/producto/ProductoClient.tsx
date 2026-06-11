@@ -41,11 +41,6 @@ export default function ProductoClient({
               {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
               <span className="ph__tag">{p.cat}</span>
             </div>
-            <div className="thumbs">
-              <div className="ph">{p.imageUrl && <img src={p.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}</div>
-              <div className="ph" />
-              <div className="ph" />
-            </div>
           </div>
 
           <div className="detail__info">

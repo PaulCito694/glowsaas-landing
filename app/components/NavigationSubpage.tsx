@@ -3,8 +3,8 @@
 import Link from 'next/link'
 
 const links = [
-  { label: 'Servicios', href: '/velme/servicios' },
-  { label: 'Tienda', href: '/velme/productos' },
+  { label: 'Servicios', href: '/servicios' },
+  { label: 'Tienda', href: '/productos' },
   { label: 'Asistente', href: '/#asistente' },
   { label: 'Galería', href: '/#galeria' },
   { label: 'Reserva', href: '/#reserva' },
