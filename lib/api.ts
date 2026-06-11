@@ -55,6 +55,12 @@ export interface CompanyInfo {
   description: string | null
   logoUrl: string | null
   coverUrl: string | null
+  heroPhoto1: string | null
+  heroPhoto2: string | null
+  instagram: string | null
+  tiktok: string | null
+  facebook: string | null
+  youtube: string | null
   ruc: string | null
   bankName: string | null
   bankAccount: string | null

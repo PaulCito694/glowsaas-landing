@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-export default function HeroSection() {
+export default function HeroSection({ heroPhoto1, heroPhoto2 }: { heroPhoto1: string | null; heroPhoto2: string | null }) {
   const heroRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -43,10 +43,14 @@ export default function HeroSection() {
         <div className="hero__layer layer-arc" data-speed="0.12" data-rot="0.005" data-depth="22" />
         <div className="hero__layer layer-arc b" data-speed="0.20" data-rot="-0.01" data-depth="40" />
         <div className="hero__layer layer-photo ph" data-speed="0.28" data-depth="30">
-          <span className="ph__tag">retrato · pestañas</span>
+          {heroPhoto1
+            ? <img src={heroPhoto1} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+            : <span className="ph__tag">retrato · pestañas</span>}
         </div>
         <div className="hero__layer layer-photo b ph" data-speed="0.40" data-depth="55">
-          <span className="ph__tag">detalle · nail art</span>
+          {heroPhoto2
+            ? <img src={heroPhoto2} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+            : <span className="ph__tag">detalle · nail art</span>}
         </div>
         <div className="hero__layer layer-dot dot-1" data-speed="0.5" data-depth="60" />
         <div className="hero__layer layer-dot dot-2" data-speed="0.35" data-depth="44" />

@@ -32,7 +32,7 @@ export default async function Home() {
       <Navigation />
       <CartDrawer />
       <main>
-        <HeroSection />
+        <HeroSection heroPhoto1={company?.heroPhoto1 ?? null} heroPhoto2={company?.heroPhoto2 ?? null} />
         <Marquee items={marqueeServices} dir="l" />
         <ScrollSequenceSection />
         <ServicesSection services={services} />
@@ -42,7 +42,7 @@ export default async function Home() {
         <GallerySection />
         <BookingSection company={company} hours={hours} />
       </main>
-      <Footer />
+      <Footer company={company} hours={hours} />
     </>
   )
 }
