@@ -38,10 +38,11 @@ export default function ProductoClient({
         <div className="detail__grid">
           <div className="detail__media">
             <div className="ph">
+              {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
               <span className="ph__tag">{p.cat}</span>
             </div>
             <div className="thumbs">
-              <div className="ph" />
+              <div className="ph">{p.imageUrl && <img src={p.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}</div>
               <div className="ph" />
               <div className="ph" />
             </div>
@@ -89,6 +90,7 @@ export default function ProductoClient({
               <article key={r.id} className="product">
                 <Link href={`/producto?id=${r.id}`} style={{ display: 'block' }}>
                   <div className="product__media ph">
+                    {r.imageUrl && <img src={r.imageUrl} alt={r.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
                     <span className="ph__tag">{r.cat}</span>
                   </div>
                 </Link>

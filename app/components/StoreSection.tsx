@@ -41,6 +41,7 @@ export default function StoreSection({ products }: { products: LandingProduct[] 
         {products.map(p => (
           <article key={p.id} className="product">
             <div className="product__media ph">
+              {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
               <span className="ph__tag">{p.cat}</span>
               <button className="product__add" onClick={() => addToCart(p)}>
                 Agregar · {fmt(p.price)}

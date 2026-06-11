@@ -32,10 +32,12 @@ export default function ServicioClient({ service, related }: Props) {
         <div className="detail__grid">
           <div className="detail__media">
             <div className="ph">
+              {service.imageUrl && <img src={service.imageUrl} alt={service.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
               <span className="ph__tag">{service.tag}</span>
             </div>
             <div className="thumbs">
-              <div className="ph" /><div className="ph" /><div className="ph" />
+              <div className="ph">{service.imageUrl && <img src={service.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}</div>
+              <div className="ph" /><div className="ph" />
             </div>
           </div>
 
@@ -82,6 +84,7 @@ export default function ServicioClient({ service, related }: Props) {
             {related.map(r => (
               <article key={r.id} className="service-card">
                 <div className="service-card__media ph">
+                  {r.imageUrl && <img src={r.imageUrl} alt={r.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
                   <span className="service-card__cat">{r.category}</span>
                   <span className="ph__tag">{r.tag}</span>
                 </div>

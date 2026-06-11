@@ -31,6 +31,7 @@ export default function ProductosClient({ products }: { products: LandingProduct
           <article key={p.id} className="product">
             <Link href={`/producto?id=${p.id}`} style={{ display: 'block' }}>
               <div className="product__media ph">
+                {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
                 <span className="ph__tag">{p.cat}</span>
               </div>
             </Link>

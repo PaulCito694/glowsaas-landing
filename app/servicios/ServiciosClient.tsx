@@ -34,6 +34,7 @@ export default function ServiciosClient({ services }: { services: Service[] }) {
         {list.map(s => (
           <article key={s.id} className="service-card">
             <div className="service-card__media ph">
+              {s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />}
               <span className="service-card__cat">{s.category}</span>
               <span className="ph__tag">{s.tag}</span>
             </div>
