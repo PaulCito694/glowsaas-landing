@@ -1,12 +1,12 @@
 'use client'
 
 import { useCart } from '../context/CartContext'
-import { VELME_PRODUCTS, fmt } from '../data/velme'
+import { fmt } from '../data/velme'
 
 export default function CartDrawer() {
-  const { items, count, total, isOpen, closeCart, setQty } = useCart()
+  const { items, total, isOpen, closeCart, setQty } = useCart()
 
-  const ids = Object.keys(items)
+  const entries = Object.values(items)
 
   return (
     <>
@@ -17,32 +17,28 @@ export default function CartDrawer() {
         </div>
 
         <div className="cart__items">
-          {ids.length === 0 ? (
+          {entries.length === 0 ? (
             <p className="cart__empty">
               Tu carrito está vacío.<br />
               Descubre nuestros esenciales de cuidado.
             </p>
           ) : (
-            ids.map(id => {
-              const p = VELME_PRODUCTS.find(x => x.id === id)
-              if (!p) return null
-              return (
-                <div key={id} className="cart-item">
-                  <div className="cart-item__media ph">
-                    <span className="ph__tag">{p.cat}</span>
-                  </div>
-                  <div className="cart-item__body">
-                    <h4>{p.name}</h4>
-                    <div className="cart-item__price">{fmt(p.price)}</div>
-                    <div className="qty">
-                      <button onClick={() => setQty(id, -1)}>−</button>
-                      <span>{items[id]}</span>
-                      <button onClick={() => setQty(id, 1)}>+</button>
-                    </div>
+            entries.map(({ product: p, qty }) => (
+              <div key={p.id} className="cart-item">
+                <div className="cart-item__media ph">
+                  <span className="ph__tag">{p.cat}</span>
+                </div>
+                <div className="cart-item__body">
+                  <h4>{p.name}</h4>
+                  <div className="cart-item__price">{fmt(p.price)}</div>
+                  <div className="qty">
+                    <button onClick={() => setQty(p.id, -1)}>−</button>
+                    <span>{qty}</span>
+                    <button onClick={() => setQty(p.id, 1)}>+</button>
                   </div>
                 </div>
-              )
-            })
+              </div>
+            ))
           )}
         </div>
 

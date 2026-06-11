@@ -2,17 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { VELME_PRODUCTS, fmt } from '../data/velme'
+import { fmt } from '../data/velme'
+import type { LandingProduct } from '@/lib/api'
 
-const FILTERS = ['Todos', 'Uñas', 'Pestañas', 'Cuidado', 'Edición'] as const
-type Filter = typeof FILTERS[number]
+export default function ProductosClient({ products }: { products: LandingProduct[] }) {
+  const cats = ['Todos', ...Array.from(new Set(products.map(p => p.cat)))]
+  const [active, setActive] = useState('Todos')
 
-export default function ProductosClient() {
-  const [active, setActive] = useState<Filter>('Todos')
-
-  const list = active === 'Todos'
-    ? VELME_PRODUCTS
-    : VELME_PRODUCTS.filter(p => p.cat === active)
+  const list = active === 'Todos' ? products : products.filter(p => p.cat === active)
 
   return (
     <main className="listing">
@@ -21,12 +18,8 @@ export default function ProductosClient() {
         <h1 className="serif">La <em>tienda</em></h1>
         <p>El cuidado del salón, en casa. Esenciales seleccionados por nuestro equipo para prolongar tus resultados.</p>
         <div className="listing__filters">
-          {FILTERS.map(f => (
-            <button
-              key={f}
-              className={active === f ? 'active' : ''}
-              onClick={() => setActive(f)}
-            >
+          {cats.map(f => (
+            <button key={f} className={active === f ? 'active' : ''} onClick={() => setActive(f)}>
               {f}
             </button>
           ))}

@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { VELME_PRODUCTS, fmt } from '../data/velme'
+import { fmt } from '../data/velme'
 import { useCart } from '../context/CartContext'
+import type { LandingProduct } from '@/lib/api'
 
-export default function StoreSection() {
+export default function StoreSection({ products }: { products: LandingProduct[] }) {
   const sectionRef = useRef<HTMLElement>(null)
   const { addToCart } = useCart()
 
@@ -37,14 +38,11 @@ export default function StoreSection() {
       </div>
 
       <div className="shop__grid">
-        {VELME_PRODUCTS.map(p => (
+        {products.map(p => (
           <article key={p.id} className="product">
             <div className="product__media ph">
               <span className="ph__tag">{p.cat}</span>
-              <button
-                className="product__add"
-                onClick={() => addToCart(p.id)}
-              >
+              <button className="product__add" onClick={() => addToCart(p)}>
                 Agregar · {fmt(p.price)}
               </button>
             </div>

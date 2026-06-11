@@ -2,6 +2,16 @@ export const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+export interface LandingProduct {
+  id: string
+  name: string
+  cat: string
+  price: number
+  imageUrl: string | null
+  short: string
+  long: string[]
+}
+
 export interface StaffMember {
   id: string
   name: string
@@ -142,6 +152,23 @@ export async function fetchAvailability(date: string): Promise<BookedSlot[]> {
     if (!res.ok) return []
     const data = await res.json()
     return data.booked ?? []
+  } catch {
+    return []
+  }
+}
+
+export async function fetchProducts(): Promise<LandingProduct[]> {
+  try {
+    const res = await fetch(`${ADMIN_URL}/api/public/products`, {
+      next: { revalidate: 60 },
+    })
+    if (!res.ok) return []
+    const rows = await res.json()
+    return rows.map((r: { id: string; name: string; cat: string; price: number; imageUrl: string | null }) => ({
+      ...r,
+      short: '',
+      long: [],
+    }))
   } catch {
     return []
   }

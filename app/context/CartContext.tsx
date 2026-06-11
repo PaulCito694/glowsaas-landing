@@ -1,50 +1,52 @@
 'use client'
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
-import { VELME_PRODUCTS, Product, fmt } from '../data/velme'
+import type { LandingProduct } from '@/lib/api'
 
-interface CartItem {
-  product: Product
+export type { LandingProduct }
+
+interface CartEntry {
+  product: LandingProduct
   qty: number
 }
 
 interface CartContextType {
-  items: Record<string, number>
+  items: Record<string, CartEntry>
   count: number
   total: string
   isOpen: boolean
   openCart: () => void
   closeCart: () => void
-  addToCart: (id: string) => void
+  addToCart: (product: LandingProduct) => void
   setQty: (id: string, delta: number) => void
 }
 
 const CartContext = createContext<CartContextType | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<Record<string, number>>({})
+  const [items, setItems] = useState<Record<string, CartEntry>>({})
   const [isOpen, setIsOpen] = useState(false)
 
-  const count = Object.values(items).reduce((s, n) => s + n, 0)
+  const count    = Object.values(items).reduce((s, e) => s + e.qty, 0)
+  const totalNum = Object.values(items).reduce((s, e) => s + e.product.price * e.qty, 0)
+  const total    = 'S/ ' + totalNum.toFixed(2)
 
-  const totalNum = Object.keys(items).reduce((s, id) => {
-    const p = VELME_PRODUCTS.find(x => x.id === id)
-    return p ? s + p.price * items[id] : s
-  }, 0)
-  const total = 'S/ ' + totalNum.toFixed(2)
-
-  const openCart = useCallback(() => setIsOpen(true), [])
+  const openCart  = useCallback(() => setIsOpen(true), [])
   const closeCart = useCallback(() => setIsOpen(false), [])
 
-  const addToCart = useCallback((id: string) => {
-    setItems(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
+  const addToCart = useCallback((product: LandingProduct) => {
+    setItems(prev => ({
+      ...prev,
+      [product.id]: { product, qty: (prev[product.id]?.qty || 0) + 1 },
+    }))
     setIsOpen(true)
   }, [])
 
   const setQty = useCallback((id: string, delta: number) => {
     setItems(prev => {
-      const next = { ...prev, [id]: (prev[id] || 0) + delta }
-      if (next[id] <= 0) delete next[id]
+      if (!prev[id]) return prev
+      const next = { ...prev, [id]: { ...prev[id], qty: prev[id].qty + delta } }
+      if (next[id].qty <= 0) delete next[id]
       return next
     })
   }, [])

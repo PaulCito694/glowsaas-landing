@@ -8,7 +8,7 @@ import AISection from './components/AISection'
 import GallerySection from './components/GallerySection'
 import BookingSection from './components/BookingSection'
 import Footer from './components/Footer'
-import { fetchServices, fetchCompany } from '@/lib/api'
+import { fetchServices, fetchCompany, fetchProducts } from '@/lib/api'
 
 const marqueeServices = [
   'Manicure Ruso', 'Volumen Ruso', 'Lifting de Pestañas',
@@ -20,9 +20,10 @@ const marqueePhrases = [
 ]
 
 export default async function Home() {
-  const [services, { company, hours }] = await Promise.all([
+  const [services, { company, hours }, products] = await Promise.all([
     fetchServices(),
     fetchCompany(),
+    fetchProducts(),
   ])
 
   return (
@@ -33,7 +34,7 @@ export default async function Home() {
         <HeroSection />
         <Marquee items={marqueeServices} dir="l" />
         <ServicesSection services={services} />
-        <StoreSection />
+        <StoreSection products={products} />
         <AISection />
         <Marquee items={marqueePhrases} dir="r" bone />
         <GallerySection />

@@ -1,23 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { VELME_PRODUCTS, fmt } from '../data/velme'
+import { fmt } from '../data/velme'
 import { useCart } from '../context/CartContext'
+import type { LandingProduct } from '@/lib/api'
 
-export default function ProductoClient() {
-  const searchParams = useSearchParams()
-  const id = searchParams.get('id')
-  const p = VELME_PRODUCTS.find(x => x.id === id) ?? VELME_PRODUCTS[0]
-  const related = VELME_PRODUCTS.filter(x => x.id !== p.id).slice(0, 3)
-
+export default function ProductoClient({
+  product,
+  related,
+}: {
+  product: LandingProduct
+  related: LandingProduct[]
+}) {
+  const p = product
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const { addToCart } = useCart()
 
   function handleAdd() {
-    for (let i = 0; i < qty; i++) addToCart(p.id)
+    for (let i = 0; i < qty; i++) addToCart(p)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
@@ -51,10 +53,12 @@ export default function ProductoClient() {
             <div className="detail__meta">
               <span className="detail__price">{fmt(p.price)}</span>
             </div>
-            <p className="detail__lead">{p.short}</p>
-            <div className="detail__body">
-              {p.long.map((t, i) => <p key={i}>{t}</p>)}
-            </div>
+            {p.short && <p className="detail__lead">{p.short}</p>}
+            {p.long.length > 0 && (
+              <div className="detail__body">
+                {p.long.map((t, i) => <p key={i}>{t}</p>)}
+              </div>
+            )}
 
             <div className="detail__cta">
               <div className="detail__qty">
@@ -77,30 +81,32 @@ export default function ProductoClient() {
         </div>
       </main>
 
-      <section className="related">
-        <h3 className="serif">También te <em>puede gustar</em></h3>
-        <div className="related__grid">
-          {related.map(r => (
-            <article key={r.id} className="product">
-              <Link href={`/producto?id=${r.id}`} style={{ display: 'block' }}>
-                <div className="product__media ph">
-                  <span className="ph__tag">{r.cat}</span>
+      {related.length > 0 && (
+        <section className="related">
+          <h3 className="serif">También te <em>puede gustar</em></h3>
+          <div className="related__grid">
+            {related.map(r => (
+              <article key={r.id} className="product">
+                <Link href={`/producto?id=${r.id}`} style={{ display: 'block' }}>
+                  <div className="product__media ph">
+                    <span className="ph__tag">{r.cat}</span>
+                  </div>
+                </Link>
+                <div className="product__info">
+                  <div>
+                    <h4>{r.name}</h4>
+                    <div className="cat">{r.cat}</div>
+                  </div>
+                  <div className="price">{fmt(r.price)}</div>
                 </div>
-              </Link>
-              <div className="product__info">
-                <div>
-                  <h4>{r.name}</h4>
-                  <div className="cat">{r.cat}</div>
-                </div>
-                <div className="price">{fmt(r.price)}</div>
-              </div>
-              <Link className="product__view" href={`/producto?id=${r.id}`}>
-                Ver producto <span className="arrow">→</span>
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
+                <Link className="product__view" href={`/producto?id=${r.id}`}>
+                  Ver producto <span className="arrow">→</span>
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   )
 }
