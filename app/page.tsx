@@ -1,6 +1,7 @@
 import Navigation from './components/Navigation'
 import HeroSection from './components/HeroSection'
 import Marquee from './components/Marquee'
+import ScrollSequenceSection from './components/ScrollSequenceSection'
 import ServicesSection from './components/ServicesSection'
 import StoreSection from './components/StoreSection'
 import CartDrawer from './components/CartDrawer'
@@ -33,6 +34,7 @@ export default async function Home() {
       <main>
         <HeroSection />
         <Marquee items={marqueeServices} dir="l" />
+        <ScrollSequenceSection />
         <ServicesSection services={services} />
         <StoreSection products={products} />
         <AISection />
