@@ -3,13 +3,22 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { fmt } from '../data/velme'
-import type { LandingProduct } from '@/lib/api'
+import type { LandingProduct, CategoryNode } from '@/lib/api'
 
-export default function ProductosClient({ products }: { products: LandingProduct[] }) {
-  const cats = ['Todos', ...Array.from(new Set(products.map(p => p.cat)))]
+export default function ProductosClient({ products, categories }: { products: LandingProduct[]; categories: CategoryNode[] }) {
   const [active, setActive] = useState('Todos')
 
-  const list = active === 'Todos' ? products : products.filter(p => p.cat === active)
+  // Build a map: parent name → [parent name, ...child names] for filtering
+  const filterMap = new Map<string, string[]>()
+  categories.forEach(p => {
+    filterMap.set(p.name, [p.name, ...p.children.map(c => c.name)])
+  })
+
+  const filters = ['Todos', ...categories.map(c => c.name)]
+
+  const list = active === 'Todos'
+    ? products
+    : products.filter(p => filterMap.get(active)?.includes(p.cat) || filterMap.get(active)?.includes(p.parentCat))
 
   return (
     <main className="listing">
@@ -18,7 +27,7 @@ export default function ProductosClient({ products }: { products: LandingProduct
         <h1 className="serif">La <em>tienda</em></h1>
         <p>El cuidado del salón, en casa. Esenciales seleccionados por nuestro equipo para prolongar tus resultados.</p>
         <div className="listing__filters">
-          {cats.map(f => (
+          {filters.map(f => (
             <button key={f} className={active === f ? 'active' : ''} onClick={() => setActive(f)}>
               {f}
             </button>

@@ -3,17 +3,21 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { fmt } from '../data/velme'
-import { durStr, type Service } from '@/lib/api'
+import { durStr, type Service, type CategoryNode } from '@/lib/api'
 
-const FILTERS = ['Todos', 'Uñas', 'Pestañas'] as const
-type Filter = typeof FILTERS[number]
+export default function ServiciosClient({ services, categories }: { services: Service[]; categories: CategoryNode[] }) {
+  const [active, setActive] = useState('Todos')
 
-export default function ServiciosClient({ services }: { services: Service[] }) {
-  const [active, setActive] = useState<Filter>('Todos')
+  const filterMap = new Map<string, string[]>()
+  categories.forEach(p => {
+    filterMap.set(p.name, [p.name, ...p.children.map(c => c.name)])
+  })
+
+  const filters = ['Todos', ...categories.map(c => c.name)]
 
   const list = active === 'Todos'
     ? services
-    : services.filter(s => s.category === active)
+    : services.filter(s => filterMap.get(active)?.includes(s.category) || filterMap.get(active)?.includes(s.parentCat))
 
   return (
     <main className="listing">
@@ -22,7 +26,7 @@ export default function ServiciosClient({ services }: { services: Service[] }) {
         <h1 className="serif">Nuestros <em>servicios</em></h1>
         <p>Cada servicio se diseña a tu medida con técnica de precisión y producto premium. Filtra por especialidad y conoce el detalle de cada uno.</p>
         <div className="listing__filters">
-          {FILTERS.map(f => (
+          {filters.map(f => (
             <button key={f} className={active === f ? 'active' : ''} onClick={() => setActive(f)}>
               {f}
             </button>

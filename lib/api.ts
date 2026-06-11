@@ -6,10 +6,18 @@ export interface LandingProduct {
   id: string
   name: string
   cat: string
+  parentCat: string
   price: number
   imageUrl: string | null
   short: string
   long: string[]
+}
+
+export interface CategoryNode {
+  id: number
+  name: string
+  slug: string
+  children: { id: number; name: string; slug: string }[]
 }
 
 export interface StaffMember {
@@ -23,6 +31,7 @@ export interface Service {
   id: string
   name: string
   category: string
+  parentCat: string
   price: number
   durationMin: number
   priceFrom: boolean
@@ -164,7 +173,7 @@ export async function fetchProducts(): Promise<LandingProduct[]> {
     })
     if (!res.ok) return []
     const rows = await res.json()
-    return rows.map((r: { id: string; name: string; cat: string; price: number; imageUrl: string | null }) => ({
+    return rows.map((r: { id: string; name: string; cat: string; parentCat: string; price: number; imageUrl: string | null }) => ({
       ...r,
       short: '',
       long: [],
@@ -172,6 +181,22 @@ export async function fetchProducts(): Promise<LandingProduct[]> {
   } catch {
     return []
   }
+}
+
+export async function fetchProductCategories(): Promise<CategoryNode[]> {
+  try {
+    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=product`, { next: { revalidate: 300 } })
+    if (!res.ok) return []
+    return res.json()
+  } catch { return [] }
+}
+
+export async function fetchServiceCategories(): Promise<CategoryNode[]> {
+  try {
+    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=service`, { next: { revalidate: 300 } })
+    if (!res.ok) return []
+    return res.json()
+  } catch { return [] }
 }
 
 export async function createAppointment(input: AppointmentInput): Promise<{ appointmentId: number } | null> {
