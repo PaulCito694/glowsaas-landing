@@ -26,9 +26,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Velme Studio — Uñas & Pestañas · Lima",
+  title: "Velme Studio — Uñas & Pestañas · Tingo María",
   description:
-    "Salón premium de uñas y pestañas en Miraflores, Lima. Reserva tu cita en línea.",
+    "Salón premium de uñas y pestañas en Tingo María. Reserva tu cita en línea.",
 };
 
 export default function RootLayout({
