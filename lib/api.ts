@@ -9,8 +9,8 @@ export interface LandingProduct {
   parentCat: string
   price: number
   imageUrl: string | null
-  short: string
-  long: string[]
+  short?: string
+  long?: string[]
 }
 
 export interface CategoryNode {
@@ -78,6 +78,15 @@ export interface DayHours {
 export interface BookedSlot {
   start: string
   durationMin: number
+}
+
+export interface GalleryItem {
+  id: number
+  imageUrl: string | null
+  tag: string
+  title: string
+  tall: boolean
+  sortOrder: number
 }
 
 export interface AppointmentInput {
@@ -203,6 +212,18 @@ export async function fetchServiceCategories(): Promise<CategoryNode[]> {
     if (!res.ok) return []
     return res.json()
   } catch { return [] }
+}
+
+export async function fetchGallery(): Promise<GalleryItem[]> {
+  try {
+    const res = await fetch(`${ADMIN_URL}/api/public/gallery`, {
+      next: { revalidate: 60 },
+    })
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
+  }
 }
 
 export async function createAppointment(input: AppointmentInput): Promise<{ appointmentId: number } | null> {

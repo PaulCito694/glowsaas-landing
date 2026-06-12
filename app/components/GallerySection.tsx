@@ -1,18 +1,19 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import type { GalleryItem } from '@/lib/api'
 
-const cards = [
-  { tag: 'nail art · floral', tall: false, title: 'Soft gel almendra', year: '2026' },
-  { tag: 'volumen ruso', tall: true, title: 'Mirada intensa', year: '2026' },
-  { tag: 'manicure ruso', tall: false, title: 'Nude impecable', year: '2026' },
-  { tag: 'lifting · tinte', tall: true, title: 'Efecto natural', year: '2026' },
-  { tag: 'nail art · cromo', tall: false, title: 'Cromo espejo', year: '2026' },
-  { tag: 'pelo a pelo', tall: true, title: 'Clásico definido', year: '2026' },
-  { tag: 'spa de manos', tall: false, title: 'Ritual completo', year: '2026' },
+const DEFAULT_CARDS = [
+  { tag: 'nail art · floral', tall: false, title: 'Soft gel almendra' },
+  { tag: 'volumen ruso',       tall: true,  title: 'Mirada intensa'   },
+  { tag: 'manicure ruso',      tall: false, title: 'Nude impecable'   },
+  { tag: 'lifting · tinte',    tall: true,  title: 'Efecto natural'   },
+  { tag: 'nail art · cromo',   tall: false, title: 'Cromo espejo'     },
+  { tag: 'pelo a pelo',        tall: true,  title: 'Clásico definido' },
+  { tag: 'spa de manos',       tall: false, title: 'Ritual completo'  },
 ]
 
-export default function GallerySection() {
+export default function GallerySection({ items }: { items?: GalleryItem[] }) {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
@@ -62,6 +63,10 @@ export default function GallerySection() {
     }
   }, [])
 
+  const cards = (items && items.length > 0)
+    ? items.map(item => ({ tag: item.tag, tall: item.tall, title: item.title, imageUrl: item.imageUrl }))
+    : DEFAULT_CARDS.map(c => ({ ...c, imageUrl: null }))
+
   return (
     <section className="gallery" id="galeria" ref={sectionRef}>
       <div className="gallery__sticky">
@@ -73,11 +78,18 @@ export default function GallerySection() {
           {cards.map((c, i) => (
             <figure key={i} className={`gallery__card${c.tall ? ' tall' : ''}`}>
               <div className="ph">
+                {c.imageUrl && (
+                  <img
+                    src={c.imageUrl}
+                    alt={c.title}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                )}
                 <span className="ph__tag">{c.tag}</span>
               </div>
               <figcaption className="cap">
                 <em>{c.title}</em>
-                <span>{c.year}</span>
+                <span>2026</span>
               </figcaption>
             </figure>
           ))}
