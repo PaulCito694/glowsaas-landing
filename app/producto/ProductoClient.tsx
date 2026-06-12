@@ -50,7 +50,7 @@ export default function ProductoClient({
               <span className="detail__price">{fmt(p.price)}</span>
             </div>
             {p.short && <p className="detail__lead">{p.short}</p>}
-            {p.long.length > 0 && (
+            {p.long && p.long.length > 0 && (
               <div className="detail__body">
                 {p.long.map((t, i) => <p key={i}>{t}</p>)}
               </div>
