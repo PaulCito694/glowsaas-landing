@@ -217,7 +217,7 @@ export async function fetchServiceCategories(): Promise<CategoryNode[]> {
 export async function fetchGallery(): Promise<GalleryItem[]> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/gallery`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     })
     if (!res.ok) return []
     return res.json()
