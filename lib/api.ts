@@ -145,7 +145,7 @@ export function isDayOpen(date: Date, hours: DayHours[]): boolean {
 export async function fetchServices(): Promise<Service[]> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/services`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     })
     if (!res.ok) return []
     const data = await res.json()
@@ -158,7 +158,7 @@ export async function fetchServices(): Promise<Service[]> {
 export async function fetchCompany(): Promise<{ company: CompanyInfo | null; hours: DayHours[] }> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/company`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     })
     if (!res.ok) return { company: null, hours: [] }
     return res.json()
@@ -184,7 +184,7 @@ export async function fetchAvailability(date: string): Promise<BookedSlot[]> {
 export async function fetchProducts(): Promise<LandingProduct[]> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/products`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     })
     if (!res.ok) return []
     const rows = await res.json()
@@ -200,7 +200,7 @@ export async function fetchProducts(): Promise<LandingProduct[]> {
 
 export async function fetchProductCategories(): Promise<CategoryNode[]> {
   try {
-    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=product`, { next: { revalidate: 300 } })
+    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=product`, { cache: 'no-store' })
     if (!res.ok) return []
     return res.json()
   } catch { return [] }
@@ -208,7 +208,7 @@ export async function fetchProductCategories(): Promise<CategoryNode[]> {
 
 export async function fetchServiceCategories(): Promise<CategoryNode[]> {
   try {
-    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=service`, { next: { revalidate: 300 } })
+    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=service`, { cache: 'no-store' })
     if (!res.ok) return []
     return res.json()
   } catch { return [] }
