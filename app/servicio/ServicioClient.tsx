@@ -41,9 +41,11 @@ export default function ServicioClient({ service, related }: Props) {
             <span className="detail__cat">{service.category}</span>
             <h1 className="serif">{service.name}</h1>
             <div className="detail__meta">
-              <span className="detail__price">
-                {service.priceFrom && <small>desde </small>}{fmt(service.price)}
-              </span>
+              {service.price > 0 && (
+                <span className="detail__price">
+                  {service.priceFrom && <small>desde </small>}{fmt(service.price)}
+                </span>
+              )}
               <span className="detail__dur">{durStr(service.durationMin)}</span>
             </div>
             <p className="detail__lead">{service.shortDesc}</p>

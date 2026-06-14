@@ -136,9 +136,11 @@ export default function ServicesSection({ services }: { services: Service[] }) {
                 <div className="service-card__body">
                   <h3 className="serif">{s.name}</h3>
                   <div className="service-card__meta">
-                    <span className="service-card__price">
-                      {s.priceFrom && <small>desde </small>}{fmt(s.price)}
-                    </span>
+                    {s.price > 0 && (
+                      <span className="service-card__price">
+                        {s.priceFrom && <small>desde </small>}{fmt(s.price)}
+                      </span>
+                    )}
                     <span className="service-card__dur">{durStr(s.durationMin)}</span>
                   </div>
                   <p className="service-card__lead">{s.shortDesc}</p>
