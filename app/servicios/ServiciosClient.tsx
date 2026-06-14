@@ -52,7 +52,7 @@ export default function ServiciosClient({ services, categories }: { services: Se
                 )}
                 <span className="service-card__dur">{durStr(s.durationMin)}</span>
               </div>
-              <p className="service-card__lead">{s.shortDesc}</p>
+              {s.shortDesc && <p className="service-card__lead">{s.shortDesc}</p>}
               <div className="service-card__foot">
                 <Link className="btn-link" href={`/servicio?id=${s.id}`}>
                   Conocer más <span className="arrow">→</span>

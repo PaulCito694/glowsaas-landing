@@ -56,6 +56,7 @@ export default function ServicesSection({ services }: { services: Service[] }) {
     let startX = 0, startIdx = 0, dragging = false
 
     const onDown = (e: PointerEvent) => {
+      if ((e.target as Element).closest('a, button')) return
       startX = e.clientX; startIdx = index; dragging = false
       track.setPointerCapture(e.pointerId)
       track.style.transition = 'none'
@@ -143,7 +144,7 @@ export default function ServicesSection({ services }: { services: Service[] }) {
                     )}
                     <span className="service-card__dur">{durStr(s.durationMin)}</span>
                   </div>
-                  <p className="service-card__lead">{s.shortDesc}</p>
+                  {s.shortDesc && <p className="service-card__lead">{s.shortDesc}</p>}
                   <div className="service-card__foot">
                     <a className="btn-link" href={`/servicio?id=${s.id}`}>
                       Conocer más <span className="arrow">→</span>

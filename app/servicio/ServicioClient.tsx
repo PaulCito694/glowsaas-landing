@@ -48,22 +48,26 @@ export default function ServicioClient({ service, related }: Props) {
               )}
               <span className="detail__dur">{durStr(service.durationMin)}</span>
             </div>
-            <p className="detail__lead">{service.shortDesc}</p>
-            <div className="detail__body">
-              {service.longDesc.map((t, i) => <p key={i}>{t}</p>)}
-            </div>
-
-            <div className="detail__block">
-              <h4>Incluye</h4>
-              <ul>
-                {service.serviceIncludes.map((item, i) => <li key={i}>{item}</li>)}
-              </ul>
-            </div>
-
-            <div className="detail__block">
-              <h4>Cuidado posterior</h4>
-              <p className="detail__care">{service.care}</p>
-            </div>
+            {service.shortDesc && <p className="detail__lead">{service.shortDesc}</p>}
+            {service.longDesc.length > 0 && (
+              <div className="detail__body">
+                {service.longDesc.map((t, i) => <p key={i}>{t}</p>)}
+              </div>
+            )}
+            {service.serviceIncludes.length > 0 && (
+              <div className="detail__block">
+                <h4>Incluye</h4>
+                <ul>
+                  {service.serviceIncludes.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+            )}
+            {service.care && (
+              <div className="detail__block">
+                <h4>Cuidado posterior</h4>
+                <p className="detail__care">{service.care}</p>
+              </div>
+            )}
 
             <div className="detail__cta">
               <Link href="/#reserva" className="btn btn--solid btn--lg">
@@ -89,12 +93,14 @@ export default function ServicioClient({ service, related }: Props) {
                 <div className="service-card__body">
                   <h3 className="serif">{r.name}</h3>
                   <div className="service-card__meta">
-                    <span className="service-card__price">
-                      {r.priceFrom && <small>desde </small>}{fmt(r.price)}
-                    </span>
+                    {r.price > 0 && (
+                      <span className="service-card__price">
+                        {r.priceFrom && <small>desde </small>}{fmt(r.price)}
+                      </span>
+                    )}
                     <span className="service-card__dur">{durStr(r.durationMin)}</span>
                   </div>
-                  <p className="service-card__lead">{r.shortDesc}</p>
+                  {r.shortDesc && <p className="service-card__lead">{r.shortDesc}</p>}
                   <div className="service-card__foot">
                     <Link className="btn-link" href={`/servicio?id=${r.id}`}>
                       Conocer más <span className="arrow">→</span>
