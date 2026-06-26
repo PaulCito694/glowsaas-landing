@@ -1,32 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { chatWithAssistant } from '@/lib/api'
 
-const FALLBACK: Record<string, string> = {
-  pesta: 'Para tus pestañas te recomiendo el Lifting + tinte (S/ 120) si quieres un look natural, o el Volumen Ruso (S/ 210) para máximo impacto. ¿Buscas algo natural o dramático? ✨',
-  uña: 'Nuestro Manicure Ruso (S/ 80) deja la cutícula impecable. Si quieres color duradero, el semipermanente (S/ 65) es ideal. ¿Te gustaría agregar nail art?',
-  una: 'Nuestro Manicure Ruso (S/ 80) deja la cutícula impecable. Si quieres color duradero, el semipermanente (S/ 65) es ideal. ¿Te gustaría agregar nail art?',
-  precio: 'Manicure Ruso S/ 80 · Semipermanente S/ 65 · Acrílicas S/ 130. En pestañas, Lifting S/ 120 y Volumen Ruso S/ 210. ¿Sobre cuál te cuento más?',
-  horario: 'Atendemos de lunes a sábado, 10:00 a 20:00, en Miraflores. Las citas se reservan con un 20% de adelanto.',
-  reserv: '¡Con gusto! Baja a la sección "Reserva tu cita" y completa tus datos. Te confirmamos por WhatsApp en minutos. ✨',
-  default: 'Con gusto te ayudo a elegir el servicio ideal. ¿Te interesan las uñas o las pestañas? También puedo contarte de precios y horarios. 💅',
-}
-
-function fallbackReply(text: string) {
-  const t = text.toLowerCase()
-  for (const k in FALLBACK) {
-    if (k !== 'default' && t.includes(k)) return FALLBACK[k]
-  }
-  return FALLBACK.default
-}
-
-interface Message { role: 'user' | 'bot'; text: string }
+interface Message { role: 'user' | 'assistant'; content: string }
 
 export default function AISection() {
   const sectionRef = useRef<HTMLElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [messages, setMessages] = useState<Message[]>([
+
+  const [messages, setMessages] = useState<Message[]>([])
+  const [displayMessages, setDisplayMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([
     { role: 'bot', text: '¡Hola! Soy la asistente de Velme Studio ✨ Cuéntame qué buscas y te ayudo a elegir tu servicio ideal.' }
   ])
   const [typing, setTyping] = useState(false)
@@ -48,34 +33,42 @@ export default function AISection() {
 
   useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight
-  }, [messages, typing])
+  }, [displayMessages, typing])
 
   async function send(text: string) {
     const trimmed = text.trim()
     if (!trimmed || disabled) return
     setDisabled(true)
-    setMessages(prev => [...prev, { role: 'user', text: trimmed }])
     if (inputRef.current) inputRef.current.value = ''
+
+    const userMsg: Message = { role: 'user', content: trimmed }
+    const nextHistory = [...messages, userMsg]
+    setMessages(nextHistory)
+    setDisplayMessages(prev => [...prev, { role: 'user', text: trimmed }])
     setTyping(true)
 
-    await new Promise(r => setTimeout(r, 900 + Math.random() * 600))
-    const reply = fallbackReply(trimmed)
+    const reply = await chatWithAssistant(nextHistory)
+
     setTyping(false)
 
+    const botText = reply || 'No pude responder en este momento. Escríbenos por WhatsApp.'
+    const assistantMsg: Message = { role: 'assistant', content: botText }
+    setMessages(prev => [...prev, assistantMsg])
+
     // Typewriter effect
-    setMessages(prev => [...prev, { role: 'bot', text: '' }])
+    setDisplayMessages(prev => [...prev, { role: 'bot', text: '' }])
     let i = 0
     const type = () => {
       i++
-      setMessages(prev => {
+      setDisplayMessages(prev => {
         const next = [...prev]
-        next[next.length - 1] = { role: 'bot', text: reply.slice(0, i) }
+        next[next.length - 1] = { role: 'bot', text: botText.slice(0, i) }
         return next
       })
-      if (i < reply.length) setTimeout(type, 14)
+      if (i < botText.length) setTimeout(type, 12)
       else setDisabled(false)
     }
-    setTimeout(type, 14)
+    setTimeout(type, 12)
   }
 
   return (
@@ -104,7 +97,7 @@ export default function AISection() {
           </div>
 
           <div className="chat__body" ref={bodyRef}>
-            {messages.map((m, i) => (
+            {displayMessages.map((m, i) => (
               <div key={i} className={`msg msg--${m.role}`}>{m.text}</div>
             ))}
             {typing && (
@@ -117,7 +110,7 @@ export default function AISection() {
           <div className="chat__suggest">
             <button onClick={() => send('Quiero algo elegante para un evento, ¿qué me recomiendan?')}>Tengo un evento</button>
             <button onClick={() => send('¿Cuánto cuesta el volumen ruso?')}>Precio volumen ruso</button>
-            <button onClick={() => send('Quiero reservar una cita')}>Reservar</button>
+            <button onClick={() => send('¿Qué productos tienen disponibles?')}>Productos</button>
           </div>
 
           <div className="chat__input">
@@ -126,6 +119,7 @@ export default function AISection() {
               type="text"
               placeholder="Escribe tu consulta…"
               autoComplete="off"
+              disabled={disabled}
               onKeyDown={e => { if (e.key === 'Enter') send((e.target as HTMLInputElement).value) }}
             />
             <button

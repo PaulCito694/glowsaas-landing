@@ -96,6 +96,7 @@ export interface AppointmentInput {
   customerName: string
   customerPhone?: string
   notes?: string
+  yapeUrl?: string
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -145,7 +146,7 @@ export function isDayOpen(date: Date, hours: DayHours[]): boolean {
 export async function fetchServices(): Promise<Service[]> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/services`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     })
     if (!res.ok) return []
     const data = await res.json()
@@ -158,7 +159,7 @@ export async function fetchServices(): Promise<Service[]> {
 export async function fetchCompany(): Promise<{ company: CompanyInfo | null; hours: DayHours[] }> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/company`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     })
     if (!res.ok) return { company: null, hours: [] }
     return res.json()
@@ -184,7 +185,7 @@ export async function fetchAvailability(date: string): Promise<BookedSlot[]> {
 export async function fetchProducts(): Promise<LandingProduct[]> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/products`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     })
     if (!res.ok) return []
     const rows = await res.json()
@@ -200,7 +201,7 @@ export async function fetchProducts(): Promise<LandingProduct[]> {
 
 export async function fetchProductCategories(): Promise<CategoryNode[]> {
   try {
-    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=product`, { cache: 'no-store' })
+    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=product`, { next: { revalidate: 300 } })
     if (!res.ok) return []
     return res.json()
   } catch { return [] }
@@ -208,7 +209,7 @@ export async function fetchProductCategories(): Promise<CategoryNode[]> {
 
 export async function fetchServiceCategories(): Promise<CategoryNode[]> {
   try {
-    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=service`, { cache: 'no-store' })
+    const res = await fetch(`${ADMIN_URL}/api/public/categories?type=service`, { next: { revalidate: 300 } })
     if (!res.ok) return []
     return res.json()
   } catch { return [] }
@@ -217,7 +218,7 @@ export async function fetchServiceCategories(): Promise<CategoryNode[]> {
 export async function fetchGallery(): Promise<GalleryItem[]> {
   try {
     const res = await fetch(`${ADMIN_URL}/api/public/gallery`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     })
     if (!res.ok) return []
     return res.json()
@@ -237,5 +238,38 @@ export async function createAppointment(input: AppointmentInput): Promise<{ appo
     return res.json()
   } catch {
     return null
+  }
+}
+
+export async function uploadProof(file: File): Promise<string | null> {
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await fetch(`${ADMIN_URL}/api/public/upload-proof`, {
+      method: 'POST',
+      body: form,
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.url ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function chatWithAssistant(
+  messages: { role: 'user' | 'assistant'; content: string }[]
+): Promise<string> {
+  try {
+    const res = await fetch(`${ADMIN_URL}/api/public/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages }),
+    })
+    if (!res.ok) return ''
+    const data = await res.json()
+    return data.reply ?? ''
+  } catch {
+    return ''
   }
 }

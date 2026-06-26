@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import {
-  slotsForDate, isSlotBooked, isDayOpen, fetchAvailability, createAppointment,
+  slotsForDate, isSlotBooked, isDayOpen, fetchAvailability, createAppointment, uploadProof,
   type DayHours, type CompanyInfo, type BookedSlot,
 } from '@/lib/api'
 import { ymd } from '../data/velme'
@@ -18,8 +18,11 @@ interface Props {
   hours: DayHours[]
 }
 
+type Step = 'form' | 'yape' | 'done'
+
 export default function BookingSection({ company, hours }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -33,9 +36,12 @@ export default function BookingSection({ company, hours }: Props) {
   const [chosenSvc, setChosenSvc] = useState('')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [submitError, setSubmitError] = useState(false)
+  const [step, setStep] = useState<Step>('form')
+
+  const [yapeFile, setYapeFile] = useState<File | null>(null)
+  const [yapePreview, setYapePreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const waLink = company?.phone
     ? `https://wa.me/${company.phone.replace(/\D/g, '')}`
@@ -127,26 +133,48 @@ export default function BookingSection({ company, hours }: Props) {
     ? `Reservarás: ${sd} de ${MONTHS[sm - 1]} a las ${selSlot}${chosenSvc ? ` · ${chosenSvc}` : ''}`
     : ''
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  function handleYapeFile(file: File) {
+    setYapeFile(file)
+    const reader = new FileReader()
+    reader.onload = e => setYapePreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selDate || !selSlot || submitting) return
-    setSubmitting(true)
-    setSubmitError(false)
+    if (!selDate || !selSlot || !name.trim() || !phone.trim()) return
+    setSubmitError('')
+    setStep('yape')
+    window.scrollTo({ top: sectionRef.current?.offsetTop ?? 0, behavior: 'smooth' })
+  }
+
+  const handleYapeSubmit = async () => {
+    if (!yapeFile || uploading) return
+    setUploading(true)
+    setSubmitError('')
+
+    const yapeUrl = await uploadProof(yapeFile)
+    if (!yapeUrl) {
+      setUploading(false)
+      setSubmitError('Error al subir el comprobante. Intenta de nuevo.')
+      return
+    }
 
     const result = await createAppointment({
-      date: selDate,
-      start: selSlot,
+      date: selDate!,
+      start: selSlot!,
       serviceId: '',
-      customerName: name,
-      customerPhone: phone || undefined,
+      customerName: name.trim(),
+      customerPhone: phone.trim(),
       notes: chosenSvc || undefined,
+      yapeUrl,
     })
 
-    setSubmitting(false)
+    setUploading(false)
     if (result) {
-      setSubmitted(true)
+      setStep('done')
     } else {
-      setSubmitError(true)
+      setSubmitError('Error al crear la reserva. Intenta por WhatsApp.')
     }
   }
 
@@ -157,27 +185,121 @@ export default function BookingSection({ company, hours }: Props) {
           <p className="eyebrow">Reserva</p>
           <div className="reveal"><h2 className="serif">Tu cita <em>te espera</em></h2></div>
           <p className="reveal">
-            Elige tu servicio y horario. Confirmamos por WhatsApp con un 20% de adelanto para asegurar tu espacio.
+            Elige tu servicio y horario. Asegura tu espacio con un adelanto de S/ 5 via Yape.
           </p>
           <div className="booking__list reveal">
-            <div><span className="n serif">1</span><span>Cuéntanos qué buscas</span></div>
-            <div><span className="n serif">2</span><span>Elige día y hora</span></div>
-            <div><span className="n serif">3</span><span>Recibe tu confirmación al instante</span></div>
+            <div><span className={`n serif${step === 'form' ? ' active' : ''}`}>1</span><span>Elige día y hora</span></div>
+            <div><span className={`n serif${step === 'yape' ? ' active' : ''}`}>2</span><span>Adjunta tu Yape (S/ 5)</span></div>
+            <div><span className={`n serif${step === 'done' ? ' active' : ''}`}>3</span><span>Confirmación al instante</span></div>
           </div>
         </div>
 
         <div className="form reveal">
-          {submitted ? (
+          {step === 'done' ? (
             <div className="form__ok">
               <div className="mark">✓</div>
-              <h3 className="serif">¡Reserva solicitada!</h3>
+              <h3 className="serif">¡Reserva confirmada!</h3>
               <p>
-                Tu cita para el <strong>{sd} de {MONTHS[sm - 1]} a las {selSlot}</strong> quedó <strong>solicitada</strong>.
+                Tu cita para el <strong>{sd} de {MONTHS[sm - 1]} a las {selSlot}</strong> está <strong>reservada</strong>.
                 Te escribiremos por WhatsApp para confirmarla.
               </p>
             </div>
+
+          ) : step === 'yape' ? (
+            <div>
+              <div style={{ marginBottom: 20 }}>
+                <h3 className="serif" style={{ fontSize: 22, marginBottom: 6 }}>Adelanto de S/ 5 via Yape</h3>
+                <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6 }}>
+                  Yapea <strong>S/ 5</strong> para reservar tu espacio y sube el comprobante aquí.
+                  {company?.phone && (
+                    <> Número Yape: <strong>{company.phone}</strong>.</>
+                  )}
+                </p>
+              </div>
+
+              <div
+                className="yape-drop"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => {
+                  e.preventDefault()
+                  const file = e.dataTransfer.files[0]
+                  if (file) handleYapeFile(file)
+                }}
+                style={{
+                  border: '2px dashed var(--line)',
+                  borderRadius: 12,
+                  padding: yapePreview ? 0 : '40px 24px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  marginBottom: 20,
+                  transition: 'border-color .2s',
+                }}
+              >
+                {yapePreview ? (
+                  <img
+                    src={yapePreview}
+                    alt="Comprobante Yape"
+                    style={{ width: '100%', maxHeight: 280, objectFit: 'contain', display: 'block' }}
+                  />
+                ) : (
+                  <>
+                    <p style={{ fontSize: 32, marginBottom: 8 }}>📸</p>
+                    <p style={{ fontSize: 14, color: 'var(--muted)' }}>Toca para subir o arrastra la captura de pantalla</p>
+                    <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>JPG, PNG o HEIC</p>
+                  </>
+                )}
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={e => e.target.files?.[0] && handleYapeFile(e.target.files[0])}
+              />
+
+              {yapePreview && (
+                <button
+                  type="button"
+                  onClick={() => { setYapeFile(null); setYapePreview(null) }}
+                  style={{ fontSize: 13, color: 'var(--muted)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 16, display: 'block' }}
+                >
+                  Cambiar imagen
+                </button>
+              )}
+
+              {submitError && (
+                <p style={{ color: 'var(--neg)', fontSize: 13, marginBottom: 12 }}>{submitError}</p>
+              )}
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  type="button"
+                  className="btn btn--ghost btn--sm"
+                  onClick={() => { setStep('form'); setSubmitError('') }}
+                  disabled={uploading}
+                >
+                  ← Volver
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--solid btn--lg"
+                  onClick={handleYapeSubmit}
+                  disabled={!yapeFile || uploading}
+                  style={{ flex: 1 }}
+                >
+                  {uploading ? 'Reservando…' : <>Confirmar reserva <span className="arrow">→</span></>}
+                </button>
+              </div>
+              <p className="form__note" style={{ marginTop: 12 }}>
+                Recibirás confirmación por WhatsApp en minutos.
+              </p>
+            </div>
+
           ) : (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleFormSubmit}>
               <div className="field">
                 <label>Servicio de interés</label>
                 <div className="chips-select">
@@ -284,17 +406,15 @@ export default function BookingSection({ company, hours }: Props) {
                 />
               </div>
 
-              {submitError && (
-                <p style={{ color: 'var(--neg)', fontSize: 13, marginBottom: 8 }}>
-                  Hubo un error al enviar. Intenta por WhatsApp.
-                </p>
-              )}
-
-              <button type="submit" className="btn btn--solid btn--lg" disabled={submitting}>
-                {submitting ? 'Enviando…' : <>Solicitar reserva <span className="arrow">→</span></>}
+              <button
+                type="submit"
+                className="btn btn--solid btn--lg"
+                disabled={!selDate || !selSlot || !name.trim() || !phone.trim()}
+              >
+                Continuar <span className="arrow">→</span>
               </button>
               <p className="form__note">
-                Tu cita queda en estado <b>"solicitada"</b>. Te confirmamos por WhatsApp y coordinamos el 20% de adelanto.
+                En el siguiente paso adjuntas tu Yape de <b>S/ 5</b> para asegurar el horario.
               </p>
             </form>
           )}
