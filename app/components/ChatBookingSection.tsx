@@ -257,7 +257,7 @@ export default function ChatBookingSection({ company, hours }: Props) {
 
     if (ok) {
       setPhase('done')
-      push('bot', `✅ ¡Tu cita está reservada, ${b.name}!\n\n📋 ${b.service}\n📅 ${fmtDate(b.date)} · ${b.slot}\n\n¡Te esperamos en Velme Studio! 💅✨\n\nTe escribiremos por WhatsApp para confirmarte.`)
+      push('bot', `⏳ ¡Solicitud recibida, ${b.name}!\n\n📋 ${b.service}\n📅 ${fmtDate(b.date)} · ${b.slot}\n\nTu cita queda en revisión. La administradora de Velme verificará tu comprobante Yape y te confirmará por WhatsApp en breve. ¡Gracias por elegirnos! 💅✨`)
     } else {
       push('bot', 'Hubo un error al procesar tu reserva. Por favor escríbenos por WhatsApp y te ayudamos de inmediato.')
       setShowUpload(true)
