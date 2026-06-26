@@ -145,7 +145,7 @@ export default function BookingSection({ company, hours }: Props) {
     if (!selDate || !selSlot || !name.trim() || !phone.trim()) return
     setSubmitError('')
     setStep('yape')
-    window.scrollTo({ top: sectionRef.current?.offsetTop ?? 0, behavior: 'smooth' })
+    setTimeout(() => sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30)
   }
 
   const handleYapeSubmit = async () => {
@@ -278,7 +278,7 @@ export default function BookingSection({ company, hours }: Props) {
                 <button
                   type="button"
                   className="btn btn--ghost btn--sm"
-                  onClick={() => { setStep('form'); setSubmitError('') }}
+                  onClick={() => { setStep('form'); setSubmitError(''); setTimeout(() => sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30) }}
                   disabled={uploading}
                 >
                   ← Volver
