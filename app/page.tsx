@@ -5,9 +5,8 @@ import ScrollSequenceSection from './components/ScrollSequenceSection'
 import ServicesSection from './components/ServicesSection'
 import StoreSection from './components/StoreSection'
 import CartDrawer from './components/CartDrawer'
-import AISection from './components/AISection'
+import ChatBookingSection from './components/ChatBookingSection'
 import GallerySection from './components/GallerySection'
-import BookingSection from './components/BookingSection'
 import Footer from './components/Footer'
 import { fetchServices, fetchCompany, fetchProducts, fetchGallery } from '@/lib/api'
 
@@ -38,10 +37,9 @@ export default async function Home() {
         <ScrollSequenceSection />
         <ServicesSection services={services} />
         <StoreSection products={products} />
-        <AISection />
+        <ChatBookingSection company={company} hours={hours} />
         <Marquee items={marqueePhrases} dir="r" bone />
         <GallerySection items={galleryItems} />
-        <BookingSection company={company} hours={hours} />
       </main>
       <Footer company={company} hours={hours} />
     </>

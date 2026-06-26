@@ -564,6 +564,55 @@ p { text-wrap: pretty }
 }
 
 /* ============================================================
+   7 · CHAT-RESERVA (ChatBookingSection)
+   ============================================================ */
+.cbook { background: var(--bone); color: var(--ink); padding: clamp(80px,12vw,160px) var(--pad) }
+.cbook__inner { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(40px,6vw,90px); max-width: 1280px; margin: 0 auto; align-items: start }
+.cbook__copy { position: sticky; top: 100px }
+.cbook__copy h2 { font-size: clamp(44px,8vw,110px); margin: 18px 0 24px; line-height: 1 }
+.cbook__copy h2 em { font-style: italic; color: var(--muted) }
+.cbook__copy p { max-width: 36ch; font-size: 16px; color: var(--muted); line-height: 1.65; margin-bottom: 36px }
+.cbook .chat { height: 680px }
+
+/* Progress steps */
+.cbook__steps { list-style: none; display: flex; flex-direction: column; gap: 14px }
+.cbook__steps li { display: flex; gap: 14px; align-items: center; font-size: 14px; color: var(--muted-2, #bbb); transition: color .4s }
+.cbook__steps li.active { color: var(--ink) }
+.cbook__steps li.done   { color: var(--ink); opacity: .45 }
+.cbook__steps .sn { font-family: var(--font-cormorant), serif; font-size: 20px; width: 28px; flex-shrink: 0 }
+
+/* Quick-reply chips (inside chat body) */
+.msg-chips { display: flex; gap: 8px; flex-wrap: wrap; align-self: flex-start; max-width: 94%; animation: msgIn .4s var(--ease) both }
+.msg-chip {
+  font-size: 12.5px; border: 1px solid var(--line); background: var(--bone);
+  padding: 8px 14px; border-radius: 30px; color: var(--ink);
+  transition: .2s var(--ease); cursor: pointer; white-space: nowrap; font-family: inherit
+}
+.msg-chip:hover { background: var(--ink); color: var(--bone); border-color: var(--ink); transform: translateY(-1px) }
+
+/* Yape upload zone inside chat body */
+.chat-upload {
+  align-self: flex-start; width: min(85%, 340px);
+  border: 2px dashed var(--line); border-radius: 12px; padding: 22px 18px;
+  text-align: center; cursor: pointer; transition: border-color .2s;
+  animation: msgIn .4s var(--ease) both
+}
+.chat-upload:hover:not(.has-img) { border-color: var(--ink) }
+.chat-upload__icon { font-size: 28px; display: block; margin-bottom: 8px }
+.chat-upload p { font-size: 13.5px; color: var(--muted); margin: 0 }
+.chat-upload__hint { font-size: 11px !important; margin-top: 4px !important }
+.chat-upload img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; display: block }
+.chat-upload__actions { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 12px; flex-wrap: wrap }
+.btn-text { font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; font-family: inherit; padding: 0 }
+.btn-text:hover { color: var(--ink) }
+
+@media (max-width:860px) {
+  .cbook__inner { display: block }
+  .cbook__copy { position: static; margin-bottom: 40px }
+  .cbook .chat { height: 580px }
+}
+
+/* ============================================================
    FOOTER
    ============================================================ */
 .footer { background: var(--bone); color: var(--ink); padding: clamp(60px,8vw,110px) var(--pad) 40px; border-top: 1px solid var(--ink) }
