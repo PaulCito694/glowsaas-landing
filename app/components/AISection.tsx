@@ -12,7 +12,7 @@ export default function AISection() {
 
   const [messages, setMessages] = useState<Message[]>([])
   const [displayMessages, setDisplayMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([
-    { role: 'bot', text: '¡Hola! Soy la asistente de Velme Studio ✨ Cuéntame qué buscas y te ayudo a elegir tu servicio ideal.' }
+    { role: 'bot', text: '¡Hola! Soy Chasqui, la asistente de Velme Studio ✨ Cuéntame qué buscas y te ayudo a elegir tu servicio ideal.' }
   ])
   const [typing, setTyping] = useState(false)
   const [disabled, setDisabled] = useState(false)
@@ -75,7 +75,7 @@ export default function AISection() {
     <section className="assistant" id="asistente" ref={sectionRef}>
       <div className="assistant__inner">
         <div className="assistant__copy">
-          <p className="eyebrow reveal" style={{ color: 'var(--ink)', opacity: 1 }}>Asistente Velme · IA</p>
+          <p className="eyebrow reveal" style={{ color: 'var(--ink)', opacity: 1 }}>Chasqui · Asistente IA</p>
           <div className="reveal"><h2 className="serif">¿No sabes qué <em>elegir</em>?</h2></div>
           <p className="reveal">
             Pregúntale a nuestra asistente. Te recomienda el servicio ideal según tu estilo, resuelve dudas de cuidado y te orienta para reservar — al instante.
@@ -89,9 +89,9 @@ export default function AISection() {
 
         <div className="chat reveal">
           <div className="chat__head">
-            <div className="chat__avatar">V</div>
+            <div className="chat__avatar">C</div>
             <div>
-              <h4>Asistente Velme</h4>
+              <h4>Chasqui · Velme Studio</h4>
               <div className="status">En línea</div>
             </div>
           </div>
