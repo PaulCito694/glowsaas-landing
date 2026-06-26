@@ -12,7 +12,7 @@ const MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','ago
 const DOW_ES    = ['dom','lun','mar','mié','jue','vie','sáb']
 
 type Phase = 'greeting' | 'service' | 'date' | 'time' | 'name' | 'phone' | 'yape' | 'done'
-type Msg   = { id: number; role: 'bot' | 'user'; text: string }
+type Msg   = { id: number; role: 'bot' | 'user'; text: string; waBtn?: string }
 type Chip  = { label: string; value: string; say?: string }
 
 interface Props { company: CompanyInfo | null; hours: DayHours[] }
@@ -60,8 +60,8 @@ export default function ChatBookingSection({ company, hours }: Props) {
   const bk   = useRef({ service: '', date: '', slot: '', name: '', phone: '' })
   const hist = useRef<{ role: 'user' | 'assistant'; content: string }[]>([])
 
-  const push = (role: 'bot' | 'user', text: string) =>
-    setMsgs(m => [...m, { id: uid(), role, text }])
+  const push = (role: 'bot' | 'user', text: string, waBtn?: string) =>
+    setMsgs(m => [...m, { id: uid(), role, text, waBtn }])
 
   const bot = (text: string, next: Chip[] = [], ms = 500) => {
     setTyping(true); setChips([])
@@ -257,7 +257,14 @@ export default function ChatBookingSection({ company, hours }: Props) {
 
     if (ok) {
       setPhase('done')
-      push('bot', `⏳ ¡Solicitud recibida, ${b.name}!\n\n📋 ${b.service}\n📅 ${fmtDate(b.date)} · ${b.slot}\n\nTu cita queda en revisión. La administradora de Velme verificará tu comprobante Yape y te confirmará por WhatsApp en breve. ¡Gracias por elegirnos! 💅✨`)
+      const waPhone = (company?.phone ?? '').replace(/\D/g, '')
+      const waText  = encodeURIComponent(`Hola Thomy, acabo de reservar mi cita 💅`)
+      const waBtn   = waPhone ? `https://wa.me/${waPhone}?text=${waText}` : undefined
+      push(
+        'bot',
+        `⏳ ¡Solicitud recibida, ${b.name}!\n\n📋 ${b.service}\n📅 ${fmtDate(b.date)} · ${b.slot}\n\nTu cita queda en revisión. Para recibir la confirmación en tu WhatsApp, toca el botón 👇`,
+        waBtn,
+      )
     } else {
       push('bot', 'Hubo un error al procesar tu reserva. Por favor escríbenos por WhatsApp y te ayudamos de inmediato.')
       setShowUpload(true)
@@ -309,6 +316,11 @@ export default function ChatBookingSection({ company, hours }: Props) {
               {msgs.map(m => (
                 <div key={m.id} className={`msg msg--${m.role}`} style={{ whiteSpace: 'pre-line' }}>
                   {m.text}
+                  {m.waBtn && (
+                    <a href={m.waBtn} target="_blank" rel="noopener noreferrer" className="msg-wa-btn">
+                      💬 Confirmar por WhatsApp →
+                    </a>
+                  )}
                 </div>
               ))}
 
